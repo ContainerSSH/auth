@@ -5,4 +5,5 @@ go 1.14
 require (
 	github.com/containerssh/http v0.9.0
 	github.com/containerssh/log v0.9.1
+	github.com/stretchr/testify v1.6.1
 )

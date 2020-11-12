@@ -35,9 +35,9 @@ func (p *passwordHandler) OnRequest(request http.ServerRequest, response http.Se
 	}
 	success, err := p.backend.OnPassword(
 		requestObject.Username,
-		requestObject.SessionID,
-		requestObject.RemoteAddress,
 		requestObject.Password,
+		requestObject.RemoteAddress,
+		requestObject.SessionID,
 	)
 	if err != nil {
 		p.logger.Warningf("failed to execute password request (%v)", err)
@@ -66,9 +66,9 @@ func (p *pubKeyHandler) OnRequest(request http.ServerRequest, response http.Serv
 	}
 	success, err := p.backend.OnPubKey(
 		requestObject.Username,
-		requestObject.SessionID,
-		requestObject.RemoteAddress,
 		requestObject.PublicKey,
+		requestObject.RemoteAddress,
+		requestObject.SessionID,
 	)
 	if err != nil {
 		p.logger.Warningf("failed to execute public key request (%v)", err)
