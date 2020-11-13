@@ -57,47 +57,11 @@ func (h *handler) OnPubKey(Username string, PublicKey []byte, RemoteAddress stri
 }
 
 func TestAuth(t *testing.T) {
-	logger := standard.New()
-	ready := make(chan bool, 1)
-	errors := make(chan error)
-
-	server, err := auth.NewServer(
-		http.ServerConfiguration{
-			Listen: "127.0.0.1:8080",
-		},
-		&handler{},
-		logger,
-		func() {
-			ready <- true
-		},
-	)
+	client, err := initializeAuth()
 	if err != nil {
-		assert.Fail(t, "failed to create server", server)
+		assert.Fail(t, "failed to initialize auth", err)
 		return
 	}
-
-	client, err := auth.NewHttpAuthClient(
-		auth.ClientConfig{
-			ClientConfiguration: http.ClientConfiguration{
-				Url: "http://127.0.0.1:8080",
-			},
-			Password: true,
-			PubKey:   true,
-		},
-		logger,
-	)
-	if err != nil {
-		assert.Fail(t, "failed to create client", server)
-		return
-	}
-
-	go func() {
-		if err := server.Run(); err != nil {
-			errors <- err
-		}
-		close(errors)
-	}()
-	<-ready
 
 	success, err := client.Password("foo", []byte("bar"), []byte("abcd"), net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
@@ -122,4 +86,47 @@ func TestAuth(t *testing.T) {
 	success, err = client.PubKey("crash", []byte("ssh-rsa asdx"), []byte("abcd"), net.ParseIP("127.0.0.1"))
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, false, success)
+}
+
+func initializeAuth() (auth.Client, error) {
+	logger := standard.New()
+	ready := make(chan bool, 1)
+	errors := make(chan error)
+
+	server, err := auth.NewServer(
+		http.ServerConfiguration{
+			Listen: "127.0.0.1:8080",
+		},
+		&handler{},
+		logger,
+		func() {
+			ready <- true
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := auth.NewHttpAuthClient(
+		auth.ClientConfig{
+			ClientConfiguration: http.ClientConfiguration{
+				Url: "http://127.0.0.1:8080",
+			},
+			Password: true,
+			PubKey:   true,
+		},
+		logger,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	go func() {
+		if err := server.Run(); err != nil {
+			errors <- err
+		}
+		close(errors)
+	}()
+	<-ready
+	return client, nil
 }
