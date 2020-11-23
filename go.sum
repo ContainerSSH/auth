@@ -1,9 +1,9 @@
-github.com/containerssh/http v0.9.0 h1:zMoVSCwa0BUSqrBzOq+oUDUu83e5s3QwpPxVLitt/nU=
-github.com/containerssh/http v0.9.0/go.mod h1:SpGAw+4qbnYgttMfNRPZaWSl6iTp1jRS+NUklCQj/3I=
-github.com/containerssh/log v0.9.1 h1:lFzNisegZH+g1osB5oda4y8vuhdq2gjp2yNSa2khr+Y=
-github.com/containerssh/log v0.9.1/go.mod h1:05pgNm7IgFKt+qbZiUhtuJw2B4j3ynn2vSv5j2JA7hA=
+github.com/containerssh/http v0.9.1 h1:n7fNwRoZR+HsuAinuIdDbSl28O/d9O7raoUUYyeQkgA=
+github.com/containerssh/http v0.9.1/go.mod h1:rKeRa8glbNsA08etU2HkRAsQ5Wn9J6Ht8Ly/aSNXC/I=
 github.com/containerssh/log v0.9.2 h1:QngZdg3EFvFxthpJY4X2qgVwqSHFTzHJ2kCiQkR7FLQ=
 github.com/containerssh/log v0.9.2/go.mod h1:05pgNm7IgFKt+qbZiUhtuJw2B4j3ynn2vSv5j2JA7hA=
+github.com/containerssh/service v0.9.0 h1:JUHqiK12tclq7EWQYGRTfgKKw6fhHs0gxlKWTvVwFlQ=
+github.com/containerssh/service v0.9.0/go.mod h1:otAKYF1MWy2eB0K7Sk7YQIECQMTHR3yikbyS1UstGpY=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/fzipp/gocyclo v0.3.1/go.mod h1:DJHO6AUmbdqj2ET4Z9iArSuwWgYDRryYt2wASxc7x3E=
