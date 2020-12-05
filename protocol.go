@@ -54,10 +54,10 @@ type PublicKeyAuthRequest struct {
 	// required: true
 	SessionID string `json:"sessionId"`
 
-	// PublicKey is a serialized key data in SSH wire format.
+	// PublicKey is the key in the authorized key format.
 	//
 	// required: true
-	PublicKey []byte `json:"publicKeyBase64"`
+	PublicKey string `json:"publicKey"`
 }
 
 // ResponseBody is a response to authentication requests.

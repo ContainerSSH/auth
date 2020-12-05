@@ -20,7 +20,7 @@ type Client interface {
 	// or not. If an error happened while contacting the authentication server it will return an error.
 	PubKey(
 		username string,
-		pubKey []byte,
+		pubKey string,
 		connectionID string,
 		remoteAddr net.IP,
 	) (bool, error)
