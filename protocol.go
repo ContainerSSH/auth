@@ -14,7 +14,12 @@ type PasswordAuthRequest struct {
 	// required: true
 	RemoteAddress string `json:"remoteAddress"`
 
-	// SessionID is an opaque ID to identify the SSH session in question.
+	// ConnectionID is an opaque ID to identify the SSH connection in question.
+	//
+	// required: true
+	ConnectionID string `json:"connectionId"`
+
+	// SessionID is a deprecated alias for ConnectionID and will be removed in the future.
 	//
 	// required: true
 	SessionID string `json:"sessionId"`
@@ -39,7 +44,12 @@ type PublicKeyAuthRequest struct {
 	// required: true
 	RemoteAddress string `json:"remoteAddress"`
 
-	// SessionID is an opaque ID to identify the SSH session in question.
+	// ConnectionID is an opaque ID to identify the SSH connection in question.
+	//
+	// required: true
+	ConnectionID string `json:"connectionId"`
+
+	// SessionID is a deprecated alias for ConnectionID and will be removed in the future.
 	//
 	// required: true
 	SessionID string `json:"sessionId"`

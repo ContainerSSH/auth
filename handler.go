@@ -15,7 +15,7 @@ type Handler interface {
 		Username string,
 		Password []byte,
 		RemoteAddress string,
-		SessionID string,
+		ConnectionID string,
 	) (bool, error)
 
 	// OnPubKey is called when the client requests a public key authentication.
@@ -32,6 +32,6 @@ type Handler interface {
 		Username string,
 		PublicKey []byte,
 		RemoteAddress string,
-		SessionID string,
+		ConnectionID string,
 	) (bool, error)
 }

@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"encoding/base64"
 	"fmt"
 	"net"
 
@@ -18,13 +17,13 @@ type httpAuthClient struct {
 func (client *httpAuthClient) Password(
 	username string,
 	password []byte,
-	sessionId []byte,
+	connectionID string,
 	remoteAddr net.IP,
 ) (success bool, err error) {
 	authRequest := PasswordAuthRequest{
 		Username:      username,
 		RemoteAddress: remoteAddr.String(),
-		SessionID:     base64.StdEncoding.EncodeToString(sessionId),
+		SessionID:     connectionID,
 		Password:      password,
 	}
 	authResponse := &ResponseBody{}
@@ -37,13 +36,13 @@ func (client *httpAuthClient) Password(
 func (client *httpAuthClient) PubKey(
 	username string,
 	pubKey []byte,
-	sessionId []byte,
+	connectionID string,
 	remoteAddr net.IP,
 ) (bool, error) {
 	authRequest := PublicKeyAuthRequest{
 		Username:      username,
 		RemoteAddress: remoteAddr.String(),
-		SessionID:     base64.StdEncoding.EncodeToString(sessionId),
+		SessionID:     connectionID,
 		PublicKey:     pubKey,
 	}
 	authResponse := &ResponseBody{}
