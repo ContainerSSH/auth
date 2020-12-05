@@ -1,7 +1,6 @@
 package auth_test
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"net"
@@ -40,14 +39,14 @@ func (h *handler) OnPassword(
 	return false, nil
 }
 
-func (h *handler) OnPubKey(Username string, PublicKey []byte, RemoteAddress string, ConnectionID string) (bool, error) {
+func (h *handler) OnPubKey(Username string, PublicKey string, RemoteAddress string, ConnectionID string) (bool, error) {
 	if RemoteAddress != "127.0.0.1" {
 		return false, fmt.Errorf("invalid IP: %s", RemoteAddress)
 	}
 	if ConnectionID != "0123456789ABCDEF" {
 		return false, fmt.Errorf("invalid session ID: %s", ConnectionID)
 	}
-	if Username == "foo" && bytes.Equal(PublicKey, []byte("ssh-rsa asdf")) {
+	if Username == "foo" && PublicKey == "ssh-rsa asdf" {
 		return true, nil
 	}
 	if Username == "crash" {
@@ -77,15 +76,15 @@ func TestAuth(t *testing.T) {
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, false, success)
 
-	success, err = client.PubKey("foo", []byte("ssh-rsa asdf"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+	success, err = client.PubKey("foo", "ssh-rsa asdf", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, true, success)
 
-	success, err = client.PubKey("foo", []byte("ssh-rsa asdx"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+	success, err = client.PubKey("foo", "ssh-rsa asdx", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, false, success)
 
-	success, err = client.PubKey("crash", []byte("ssh-rsa asdx"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+	success, err = client.PubKey("crash", "ssh-rsa asdx", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, false, success)
 }

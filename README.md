@@ -21,7 +21,7 @@ type myHandler struct {
 func (h *myHandler) OnPassword(
     Username string,
     RemoteAddress string,
-    SessionID string,
+    ConnectionID string,
     Password []byte,
 ) (bool, error) {
     if Username == "foo" && string(Password) == "bar" {
@@ -93,14 +93,14 @@ client := auth.NewHttpAuthClient(
 success, err := client.Password(
     "foo",
     []byte("bar"),
-    []byte("asdf"),
+    "0123456789ABCDEF",
     ip
 ) (bool, error)
 
 success, err := client.PubKey(
     "foo",
-    []byte("bar"),
-    []byte("ssh-rsa ..."),
+    "ssh-rsa ...",
+    "0123456789ABCDEF",
     ip
 ) (bool, error)
 ```

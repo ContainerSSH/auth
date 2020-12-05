@@ -35,7 +35,7 @@ func (client *httpAuthClient) Password(
 
 func (client *httpAuthClient) PubKey(
 	username string,
-	pubKey []byte,
+	pubKey string,
 	connectionID string,
 	remoteAddr net.IP,
 ) (bool, error) {

@@ -21,7 +21,7 @@ type Handler interface {
 	// OnPubKey is called when the client requests a public key authentication.
 	//
 	// - Username is the username the user entered.
-	// - PublicKey is the public key of the user in OpenSSH wire format.
+	// - PublicKey is the public key of the user in the authorized key format.
 	// - RemoteAddress is the IP address of the user.
 	// - SessionID is an opaque identifier for the current session.
 	//
@@ -30,7 +30,7 @@ type Handler interface {
 	// a HTTP 500 response.
 	OnPubKey(
 		Username string,
-		PublicKey []byte,
+		PublicKey string,
 		RemoteAddress string,
 		ConnectionID string,
 	) (bool, error)
