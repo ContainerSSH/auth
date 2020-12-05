@@ -12,7 +12,7 @@ type Client interface {
 	Password(
 		username string,
 		password []byte,
-		sessionId []byte,
+		connectionID string,
 		remoteAddr net.IP,
 	) (bool, error)
 
@@ -21,7 +21,7 @@ type Client interface {
 	PubKey(
 		username string,
 		pubKey []byte,
-		sessionId []byte,
+		connectionID string,
 		remoteAddr net.IP,
 	) (bool, error)
 }

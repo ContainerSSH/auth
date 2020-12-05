@@ -11,12 +11,11 @@ func NewServer(
 	configuration http.ServerConfiguration,
 	h Handler,
 	logger log.Logger,
-	onReady func(),
 ) (http.Server, error) {
 	return http.NewServer(
+		"Auth Server",
 		configuration,
 		NewHandler(h, logger),
-		onReady,
 		logger,
 	)
 }

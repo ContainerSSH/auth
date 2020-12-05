@@ -2,13 +2,14 @@ package auth_test
 
 import (
 	"bytes"
-	"encoding/base64"
+	"context"
 	"fmt"
 	"net"
 	"testing"
 
 	"github.com/containerssh/http"
 	"github.com/containerssh/log/standard"
+	"github.com/containerssh/service"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/containerssh/auth"
@@ -21,13 +22,13 @@ func (h *handler) OnPassword(
 	Username string,
 	Password []byte,
 	RemoteAddress string,
-	SessionID string,
+	ConnectionID string,
 ) (bool, error) {
 	if RemoteAddress != "127.0.0.1" {
 		return false, fmt.Errorf("invalid IP: %s", RemoteAddress)
 	}
-	if SessionID != base64.StdEncoding.EncodeToString([]byte("abcd")) {
-		return false, fmt.Errorf("invalid session ID: %s", SessionID)
+	if ConnectionID != "0123456789ABCDEF" {
+		return false, fmt.Errorf("invalid connection ID: %s", ConnectionID)
 	}
 	if Username == "foo" && string(Password) == "bar" {
 		return true, nil
@@ -39,12 +40,12 @@ func (h *handler) OnPassword(
 	return false, nil
 }
 
-func (h *handler) OnPubKey(Username string, PublicKey []byte, RemoteAddress string, SessionID string) (bool, error) {
+func (h *handler) OnPubKey(Username string, PublicKey []byte, RemoteAddress string, ConnectionID string) (bool, error) {
 	if RemoteAddress != "127.0.0.1" {
 		return false, fmt.Errorf("invalid IP: %s", RemoteAddress)
 	}
-	if SessionID != base64.StdEncoding.EncodeToString([]byte("abcd")) {
-		return false, fmt.Errorf("invalid session ID: %s", SessionID)
+	if ConnectionID != "0123456789ABCDEF" {
+		return false, fmt.Errorf("invalid session ID: %s", ConnectionID)
 	}
 	if Username == "foo" && bytes.Equal(PublicKey, []byte("ssh-rsa asdf")) {
 		return true, nil
@@ -57,38 +58,39 @@ func (h *handler) OnPubKey(Username string, PublicKey []byte, RemoteAddress stri
 }
 
 func TestAuth(t *testing.T) {
-	client, err := initializeAuth()
+	client, lifecycle, err := initializeAuth()
 	if err != nil {
 		assert.Fail(t, "failed to initialize auth", err)
 		return
 	}
+	defer lifecycle.Stop(context.Background())
 
-	success, err := client.Password("foo", []byte("bar"), []byte("abcd"), net.ParseIP("127.0.0.1"))
+	success, err := client.Password("foo", []byte("bar"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, true, success)
 
-	success, err = client.Password("foo", []byte("baz"), []byte("abcd"), net.ParseIP("127.0.0.1"))
+	success, err = client.Password("foo", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, false, success)
 
-	success, err = client.Password("crash", []byte("baz"), []byte("abcd"), net.ParseIP("127.0.0.1"))
+	success, err = client.Password("crash", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, false, success)
 
-	success, err = client.PubKey("foo", []byte("ssh-rsa asdf"), []byte("abcd"), net.ParseIP("127.0.0.1"))
+	success, err = client.PubKey("foo", []byte("ssh-rsa asdf"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, true, success)
 
-	success, err = client.PubKey("foo", []byte("ssh-rsa asdx"), []byte("abcd"), net.ParseIP("127.0.0.1"))
+	success, err = client.PubKey("foo", []byte("ssh-rsa asdx"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, false, success)
 
-	success, err = client.PubKey("crash", []byte("ssh-rsa asdx"), []byte("abcd"), net.ParseIP("127.0.0.1"))
+	success, err = client.PubKey("crash", []byte("ssh-rsa asdx"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, false, success)
 }
 
-func initializeAuth() (auth.Client, error) {
+func initializeAuth() (auth.Client, service.Lifecycle, error) {
 	logger := standard.New()
 	ready := make(chan bool, 1)
 	errors := make(chan error)
@@ -99,12 +101,9 @@ func initializeAuth() (auth.Client, error) {
 		},
 		&handler{},
 		logger,
-		func() {
-			ready <- true
-		},
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	client, err := auth.NewHttpAuthClient(
@@ -118,15 +117,22 @@ func initializeAuth() (auth.Client, error) {
 		logger,
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
+	lifecycle := service.NewLifecycle(server)
+	lifecycle.OnRunning(
+		func(_ service.Service, _ service.Lifecycle) {
+			ready <- true
+		},
+	)
+
 	go func() {
-		if err := server.Run(); err != nil {
+		if err := lifecycle.Run(); err != nil {
 			errors <- err
 		}
 		close(errors)
 	}()
 	<-ready
-	return client, nil
+	return client, lifecycle, nil
 }
