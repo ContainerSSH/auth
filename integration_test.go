@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"os"
 	"testing"
 
 	"github.com/containerssh/http"
-	"github.com/containerssh/log/standard"
+	"github.com/containerssh/log"
 	"github.com/containerssh/service"
 	"github.com/stretchr/testify/assert"
 
@@ -57,7 +58,17 @@ func (h *handler) OnPubKey(Username string, PublicKey string, RemoteAddress stri
 }
 
 func TestAuth(t *testing.T) {
-	client, lifecycle, err := initializeAuth()
+	logger, err := log.New(
+		log.Config{
+			Level:  log.LevelDebug,
+			Format: "text",
+		},
+		"auth",
+		os.Stdout,
+	)
+	assert.NoError(t, err)
+	logger.Infof("FYI: two auth warnings during this test are expected as we test against error cases.")
+	client, lifecycle, err := initializeAuth(logger)
 	if err != nil {
 		assert.Fail(t, "failed to initialize auth", err)
 		return
@@ -89,8 +100,7 @@ func TestAuth(t *testing.T) {
 	assert.Equal(t, false, success)
 }
 
-func initializeAuth() (auth.Client, service.Lifecycle, error) {
-	logger := standard.New()
+func initializeAuth(logger log.Logger) (auth.Client, service.Lifecycle, error) {
 	ready := make(chan bool, 1)
 	errors := make(chan error)
 
