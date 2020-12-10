@@ -6,7 +6,7 @@ import (
 
 // ClientConfig is the configuration of the authentication client.
 type ClientConfig struct {
-	http.ClientConfiguration
+	http.ClientConfiguration `json:",inline" yaml:",inline"`
 
 	// Password is a flag to enable password authentication.
 	Password bool `json:"password" yaml:"password" comment:"Perform password authentication" default:"true"`
