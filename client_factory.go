@@ -13,7 +13,7 @@ func NewHttpAuthClient(
 	config ClientConfig,
 	logger log.Logger,
 ) (Client, error) {
-	if config.Url == "" {
+	if config.URL == "" {
 		return nil, fmt.Errorf("no authentication server URL provided")
 	}
 	realClient, err := http.NewClient(

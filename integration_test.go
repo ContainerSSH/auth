@@ -118,7 +118,7 @@ func initializeAuth(logger log.Logger) (auth.Client, service.Lifecycle, error) {
 	client, err := auth.NewHttpAuthClient(
 		auth.ClientConfig{
 			ClientConfiguration: http.ClientConfiguration{
-				Url: "http://127.0.0.1:8080",
+				URL: "http://127.0.0.1:8080",
 			},
 			Password: true,
 			PubKey:   true,

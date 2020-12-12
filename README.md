@@ -83,7 +83,7 @@ This library also provides a HTTP client for authentication servers. This librar
 ```go
 client := auth.NewHttpAuthClient(
     auth.ClientConfig{
-        Url: "http://localhost:8080"
+        URL: "http://localhost:8080"
         Password: true,
         PubKey: false,
     },
