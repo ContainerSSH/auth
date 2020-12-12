@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.3: Bumped HTTP dependency
+
+Bumped [http](https://github.com/containerssh/http) dependency to 0.9.2.
+
 ## 0.9.2: Fixed YAML and JSON serialization
 
 This release fixes how the client configuration structure is serialized and unserialized. Previously, we missed to add the `inline` option to the embedded option to the HTTP client config which lead to a substructure being created. This is now fixed. 
