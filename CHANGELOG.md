@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.4: Authentication retry
+
+This release adds retries to the authentication process. This allows ContainerSSH to retry requests that lead to a non-200 status code.
+
 ## 0.9.3: Bumped HTTP dependency
 
 Bumped [http](https://github.com/containerssh/http) dependency to 0.9.2.

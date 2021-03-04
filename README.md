@@ -92,6 +92,10 @@ client := auth.NewHttpAuthClient(
         URL: "http://localhost:8080"
         Password: true,
         PubKey: false,
+        // This is the timeout for individual requests.
+        Timeout: 2 * time.Second,
+        // This is the overall timeout for the authentication process.
+        AuthTimeout: 60 * time.Second,
     },
     logger,
 )
