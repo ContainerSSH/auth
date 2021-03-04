@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/containerssh/http"
@@ -18,4 +19,12 @@ type ClientConfig struct {
 	Password bool `json:"password" yaml:"password" comment:"Perform password authentication" default:"true"`
 	// PubKey is a flag to enable public key authentication.
 	PubKey bool `json:"pubkey" yaml:"pubkey" comment:"Perform public key authentication" default:"false"`
+}
+
+// Validate validates the authentication client configuration.
+func (c *ClientConfig) Validate() error {
+	if c.Timeout < 100*time.Millisecond {
+		return fmt.Errorf("auth timeout value %s is too low, must be at least 100ms", c.Timeout.String())
+	}
+	return c.ClientConfiguration.Validate()
 }

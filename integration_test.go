@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"testing"
+	"time"
 
 	"github.com/containerssh/http"
 	"github.com/containerssh/log"
@@ -114,10 +115,12 @@ func initializeAuth(logger log.Logger) (auth.Client, service.Lifecycle, error) {
 	client, err := auth.NewHttpAuthClient(
 		auth.ClientConfig{
 			ClientConfiguration: http.ClientConfiguration{
-				URL: "http://127.0.0.1:8080",
+				URL:     "http://127.0.0.1:8080",
+				Timeout: 2 * time.Second,
 			},
-			Password: true,
-			PubKey:   true,
+			Password:    true,
+			PubKey:      true,
+			AuthTimeout: 2 * time.Second,
 		},
 		logger,
 	)

@@ -61,18 +61,18 @@ func (client *httpAuthClient) processAuthWithRetry(
 	url string,
 	authRequest interface{},
 ) (bool, error) {
-	client.logger.Debug(
-		log.NewMessage(
-			MAuth,
-			"%s authentication request",
-			method,
-		).Label("connectionId", connectionID).Label("username", username).Label("url", url),
-	)
 	ctx, cancel := context.WithTimeout(context.Background(), client.timeout)
 	defer cancel()
 	var lastError error
 loop:
 	for {
+		client.logger.Debug(
+			log.NewMessage(
+				MAuth,
+				"%s authentication request",
+				method,
+			).Label("connectionId", connectionID).Label("username", username).Label("url", url),
+		)
 		authResponse := &ResponseBody{}
 		lastError = client.authServerRequest(url, authRequest, authResponse)
 		if lastError == nil {
