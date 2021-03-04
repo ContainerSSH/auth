@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net"
-	"os"
 	"testing"
 
 	"github.com/containerssh/http"
@@ -58,16 +57,13 @@ func (h *handler) OnPubKey(Username string, PublicKey string, RemoteAddress stri
 }
 
 func TestAuth(t *testing.T) {
-	logger, err := log.New(
-		log.Config{
-			Level:  log.LevelDebug,
-			Format: "text",
-		},
-		"auth",
-		os.Stdout,
+	logger := log.NewTestLogger(t)
+	logger.Info(
+		log.NewMessage(
+			"TEST",
+			"FYI: errors during this test are expected as we test against error cases.",
+		),
 	)
-	assert.NoError(t, err)
-	logger.Infof("FYI: two auth warnings during this test are expected as we test against error cases.")
 	client, lifecycle, err := initializeAuth(logger)
 	if err != nil {
 		assert.Fail(t, "failed to initialize auth", err)

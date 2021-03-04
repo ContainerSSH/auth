@@ -24,6 +24,7 @@ func NewHttpAuthClient(
 		return nil, err
 	}
 	return &httpAuthClient{
+		timeout:    config.AuthTimeout,
 		httpClient: realClient,
 		logger:     logger,
 	}, nil
