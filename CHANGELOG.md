@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.5: Direct metrics support
+
+This release adds metrics support directly in the auth library.
+
 ## 0.9.4: Authentication retry
 
 This release adds retries to the authentication process. This allows ContainerSSH to retry requests that lead to a non-200 status code.

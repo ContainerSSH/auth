@@ -13,7 +13,7 @@ type ClientConfig struct {
 
 	// AuthTimeout is the timeout for the overall authentication call (e.g. verifying a password). If the server
 	// responds with a non-200 response the call will be retried until this timeout is reached.
-	AuthTimeout time.Duration `json:"timeout" yaml:"timeout" default:"60s"`
+	AuthTimeout time.Duration `json:"authTimeout" yaml:"authTimeout" default:"60s"`
 
 	// Password is a flag to enable password authentication.
 	Password bool `json:"password" yaml:"password" comment:"Perform password authentication" default:"true"`

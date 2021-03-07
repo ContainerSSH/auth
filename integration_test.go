@@ -7,8 +7,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/containerssh/geoip"
 	"github.com/containerssh/http"
 	"github.com/containerssh/log"
+	"github.com/containerssh/metrics"
 	"github.com/containerssh/service"
 	"github.com/stretchr/testify/assert"
 
@@ -65,7 +67,7 @@ func TestAuth(t *testing.T) {
 			"FYI: errors during this test are expected as we test against error cases.",
 		),
 	)
-	client, lifecycle, err := initializeAuth(logger)
+	client, lifecycle, metricsCollector, err := initializeAuth(logger)
 	if err != nil {
 		assert.Fail(t, "failed to initialize auth", err)
 		return
@@ -75,14 +77,18 @@ func TestAuth(t *testing.T) {
 	success, err := client.Password("foo", []byte("bar"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, true, success)
+	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthBackendRequests)[0].Value)
+	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthSuccess)[0].Value)
 
 	success, err = client.Password("foo", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, false, success)
+	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthFailure)[0].Value)
 
 	success, err = client.Password("crash", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, false, success)
+	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthBackendFailure)[0].Value)
 
 	success, err = client.PubKey("foo", "ssh-rsa asdf", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
@@ -97,7 +103,7 @@ func TestAuth(t *testing.T) {
 	assert.Equal(t, false, success)
 }
 
-func initializeAuth(logger log.Logger) (auth.Client, service.Lifecycle, error) {
+func initializeAuth(logger log.Logger) (auth.Client, service.Lifecycle, metrics.Collector, error) {
 	ready := make(chan bool, 1)
 	errors := make(chan error)
 
@@ -109,8 +115,17 @@ func initializeAuth(logger log.Logger) (auth.Client, service.Lifecycle, error) {
 		logger,
 	)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
+
+	geoipProvider, err := geoip.New(geoip.Config{
+		Provider: geoip.DummyProvider,
+	})
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	metricsCollector := metrics.New(geoipProvider)
 
 	client, err := auth.NewHttpAuthClient(
 		auth.ClientConfig{
@@ -123,9 +138,10 @@ func initializeAuth(logger log.Logger) (auth.Client, service.Lifecycle, error) {
 			AuthTimeout: 2 * time.Second,
 		},
 		logger,
+		metricsCollector,
 	)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	lifecycle := service.NewLifecycle(server)
@@ -142,5 +158,5 @@ func initializeAuth(logger log.Logger) (auth.Client, service.Lifecycle, error) {
 		close(errors)
 	}()
 	<-ready
-	return client, lifecycle, nil
+	return client, lifecycle, metricsCollector, nil
 }
