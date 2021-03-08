@@ -2,7 +2,7 @@
 
 | Code | Explanation |
 |------|-------------|
-| `AUTH` | ContainerSSH is trying to contact the authentication backend. |
+| `AUTH` | ContainerSSH is trying to contact the authentication backend to verify the user credentials. |
 | `AUTH_BACKEND_ERROR` | The ContainerSSH authentication server responded with a non-200 status code. ContainerSSH will retry the authentication for a few times before giving up. This is most likely a bug in your authentication server, please check your logs. |
 | `AUTH_FAILED` | The user has provided invalid credentials and the authentication is rejected. |
 | `AUTH_INVALID_STATUS` | This message indicates that the authentication server returned an invalid HTTP status code. |
