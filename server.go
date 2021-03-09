@@ -17,5 +17,8 @@ func NewServer(
 		configuration,
 		NewHandler(h, logger),
 		logger,
+		func(url string) {
+			logger.Info(log.NewMessage(MAuthServerAvailable, "The authentication server is now available at %s", url))
+		},
 	)
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.6: Server ready message
+
+This release adds a message when the authentication server is ready.
+
 ## 0.9.5: Direct metrics support
 
 This release adds metrics support directly in the auth library.

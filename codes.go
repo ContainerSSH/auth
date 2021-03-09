@@ -16,3 +16,6 @@ const EAuthFailed = "AUTH_FAILED"
 
 // The user has provided the correct credentials and the authentication is accepted.
 const MAuthSuccessful = "AUTH_SUCCESSFUL"
+
+// The ContainerSSH authentication server is now available.
+const MAuthServerAvailable = "AUTH_AVAILABLE"
