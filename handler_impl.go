@@ -37,7 +37,7 @@ func (p *passwordHandler) OnRequest(request http.ServerRequest, response http.Se
 		requestObject.Username,
 		requestObject.Password,
 		requestObject.RemoteAddress,
-		requestObject.SessionID,
+		requestObject.ConnectionID,
 	)
 	if err != nil {
 		p.logger.Warningf("failed to execute password request (%v)", err)
