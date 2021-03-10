@@ -36,6 +36,7 @@ func (client *httpAuthClient) Password(
 	authRequest := PasswordAuthRequest{
 		Username:      username,
 		RemoteAddress: remoteAddr.String(),
+		ConnectionID:  connectionID,
 		SessionID:     connectionID,
 		Password:      password,
 	}
@@ -53,6 +54,7 @@ func (client *httpAuthClient) PubKey(
 	authRequest := PublicKeyAuthRequest{
 		Username:      username,
 		RemoteAddress: remoteAddr.String(),
+		ConnectionID:  connectionID,
 		SessionID:     connectionID,
 		PublicKey:     pubKey,
 	}
