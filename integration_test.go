@@ -47,7 +47,7 @@ func (h *handler) OnPubKey(Username string, PublicKey string, RemoteAddress stri
 		return false, fmt.Errorf("invalid IP: %s", RemoteAddress)
 	}
 	if ConnectionID != "0123456789ABCDEF" {
-		return false, fmt.Errorf("invalid session ID: %s", ConnectionID)
+		return false, fmt.Errorf("invalid connection ID: %s", ConnectionID)
 	}
 	if Username == "foo" && PublicKey == "ssh-rsa asdf" {
 		return true, nil

@@ -40,7 +40,7 @@ func (p *passwordHandler) OnRequest(request http.ServerRequest, response http.Se
 		requestObject.ConnectionID,
 	)
 	if err != nil {
-		p.logger.Warningf("failed to execute password request (%v)", err)
+		p.logger.Debug(log.Wrap(err, ERequestDecodeFailed, "failed to execute password request"))
 		response.SetStatus(500)
 		response.SetBody(ResponseBody{
 			Success: false,
@@ -68,10 +68,10 @@ func (p *pubKeyHandler) OnRequest(request http.ServerRequest, response http.Serv
 		requestObject.Username,
 		requestObject.PublicKey,
 		requestObject.RemoteAddress,
-		requestObject.SessionID,
+		requestObject.ConnectionID,
 	)
 	if err != nil {
-		p.logger.Warningf("failed to execute public key request (%v)", err)
+		p.logger.Debug(log.Wrap(err, ERequestDecodeFailed, "failed to execute public key request"))
 		response.SetStatus(500)
 		response.SetBody(ResponseBody{
 			Success: false,

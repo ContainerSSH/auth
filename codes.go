@@ -19,3 +19,6 @@ const MAuthSuccessful = "AUTH_SUCCESSFUL"
 
 // The ContainerSSH authentication server is now available.
 const MAuthServerAvailable = "AUTH_AVAILABLE"
+
+// The ContainerSSH Auth library failed to decode a request from ContainerSSH.
+const ERequestDecodeFailed = "AUTH_SERVER_DECODE_FAILED"
