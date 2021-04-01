@@ -3,11 +3,11 @@ module github.com/containerssh/auth
 go 1.14
 
 require (
-	github.com/containerssh/geoip v0.9.4 // indirect
-	github.com/containerssh/http v0.9.9
-	github.com/containerssh/log v0.9.13
-	github.com/containerssh/metrics v0.9.8
-	github.com/containerssh/service v0.9.3
+	github.com/containerssh/geoip v1.0.0 // indirect
+	github.com/containerssh/http v1.0.0
+	github.com/containerssh/log v1.0.0
+	github.com/containerssh/metrics v1.0.0
+	github.com/containerssh/service v1.0.0
 	github.com/stretchr/testify v1.7.0
 )
 

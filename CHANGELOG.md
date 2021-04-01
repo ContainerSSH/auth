@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0: First stable release
+
+This release tags the first stable version for ContainerSSH 0.4.0.
+
 ## 0.9.6: Server ready message
 
 This release adds a message when the authentication server is ready.
