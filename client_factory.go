@@ -46,6 +46,8 @@ func NewHttpAuthClient(
 		"The number of failed authentications.",
 	)
 	return &httpAuthClient{
+		enablePassword:        config.Password,
+		enablePubKey:          config.PubKey,
 		timeout:               config.AuthTimeout,
 		httpClient:            realClient,
 		logger:                logger,

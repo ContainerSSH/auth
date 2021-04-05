@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1: Fixing ignored authentication config
+
+This release fixes [ContainerSSH/ContainerSSH#167](https://github.com/ContainerSSH/ContainerSSH/issues/167) where both the `password` and the `pubkey` options are ignored in the configuration.
+
 ## 1.0.0: First stable release
 
 This release tags the first stable version for ContainerSSH 0.4.0.

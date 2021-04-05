@@ -18,7 +18,7 @@ type ClientConfig struct {
 	// Password is a flag to enable password authentication.
 	Password bool `json:"password" yaml:"password" comment:"Perform password authentication" default:"true"`
 	// PubKey is a flag to enable public key authentication.
-	PubKey bool `json:"pubkey" yaml:"pubkey" comment:"Perform public key authentication" default:"false"`
+	PubKey bool `json:"pubkey" yaml:"pubkey" comment:"Perform public key authentication" default:"true"`
 }
 
 // Validate validates the authentication client configuration.
