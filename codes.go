@@ -22,3 +22,6 @@ const MAuthServerAvailable = "AUTH_AVAILABLE"
 
 // The ContainerSSH Auth library failed to decode a request from ContainerSSH.
 const ERequestDecodeFailed = "AUTH_SERVER_DECODE_FAILED"
+
+// The authentication method the client tried is disabled.
+const EDisabled = "AUTH_DISABLED"

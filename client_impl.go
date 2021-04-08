@@ -22,6 +22,8 @@ type httpAuthClient struct {
 	backendFailureMetric  metrics.SimpleCounter
 	authSuccessMetric     metrics.GeoCounter
 	authFailureMetric     metrics.GeoCounter
+	enablePassword        bool
+	enablePubKey          bool
 }
 
 func (client *httpAuthClient) Password(
@@ -30,6 +32,15 @@ func (client *httpAuthClient) Password(
 	connectionID string,
 	remoteAddr net.IP,
 ) (bool, error) {
+	if !client.enablePassword {
+		err := log.UserMessage(
+			EDisabled,
+			"Password authentication failed.",
+			"Password authentication is disabled.",
+		)
+		client.logger.Debug(err)
+		return false, err
+	}
 	url := client.endpoint + "/password"
 	method := "Password"
 	authType := "password"
@@ -50,6 +61,15 @@ func (client *httpAuthClient) PubKey(
 	connectionID string,
 	remoteAddr net.IP,
 ) (bool, error) {
+	if !client.enablePubKey {
+		err := log.UserMessage(
+			EDisabled,
+			"Public key authentication failed.",
+			"Public key authentication is disabled.",
+		)
+		client.logger.Debug(err)
+		return false, err
+	}
 	url := client.endpoint + "/pubkey"
 	authRequest := PublicKeyAuthRequest{
 		Username:      username,
