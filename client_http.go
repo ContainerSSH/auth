@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"net"
 	"strings"
@@ -26,12 +27,49 @@ type httpAuthClient struct {
 	enablePubKey          bool
 }
 
+type httpAuthContext struct {
+	success bool
+	metadata map[string]string
+	err error
+}
+
+func (h httpAuthContext) Success() bool {
+	return h.success
+}
+
+func (h httpAuthContext) Error() error {
+	return h.err
+}
+
+func (h httpAuthContext) Metadata() map[string]string {
+	return h.metadata
+}
+
+func (h httpAuthContext) OnDisconnect() {
+}
+
+func (client *httpAuthClient) KeyboardInteractive(
+	_ string,
+	_ func(instruction string, questions KeyboardInteractiveQuestions) (
+		answers KeyboardInteractiveAnswers,
+		err error,
+	),
+	_ string,
+	_ net.IP,
+) AuthenticationContext {
+	return &httpAuthContext{false, nil, log.UserMessage(
+		EUnsupported,
+		"Keyboard-interactive authentication is not available.",
+		"Webhook authentication doesn't support keyboard-interactive.",
+	)}
+}
+
 func (client *httpAuthClient) Password(
 	username string,
 	password []byte,
 	connectionID string,
 	remoteAddr net.IP,
-) (bool, error) {
+) AuthenticationContext {
 	if !client.enablePassword {
 		err := log.UserMessage(
 			EDisabled,
@@ -39,7 +77,7 @@ func (client *httpAuthClient) Password(
 			"Password authentication is disabled.",
 		)
 		client.logger.Debug(err)
-		return false, err
+		return &httpAuthContext{false, nil, err}
 	}
 	url := client.endpoint + "/password"
 	method := "Password"
@@ -49,7 +87,7 @@ func (client *httpAuthClient) Password(
 		RemoteAddress: remoteAddr.String(),
 		ConnectionID:  connectionID,
 		SessionID:     connectionID,
-		Password:      password,
+		Password:      base64.StdEncoding.EncodeToString(password),
 	}
 
 	return client.processAuthWithRetry(username, method, authType, connectionID, url, authRequest, remoteAddr)
@@ -60,7 +98,7 @@ func (client *httpAuthClient) PubKey(
 	pubKey string,
 	connectionID string,
 	remoteAddr net.IP,
-) (bool, error) {
+) AuthenticationContext {
 	if !client.enablePubKey {
 		err := log.UserMessage(
 			EDisabled,
@@ -68,7 +106,7 @@ func (client *httpAuthClient) PubKey(
 			"Public key authentication is disabled.",
 		)
 		client.logger.Debug(err)
-		return false, err
+		return &httpAuthContext{false, nil, err}
 	}
 	url := client.endpoint + "/pubkey"
 	authRequest := PublicKeyAuthRequest{
@@ -92,7 +130,7 @@ func (client *httpAuthClient) processAuthWithRetry(
 	url string,
 	authRequest interface{},
 	remoteAddr net.IP,
-) (bool, error) {
+) AuthenticationContext {
 	ctx, cancel := context.WithTimeout(context.Background(), client.timeout)
 	defer cancel()
 	var lastError error
@@ -124,7 +162,7 @@ loop:
 		lastError = client.authServerRequest(url, authRequest, authResponse)
 		if lastError == nil {
 			client.logAuthResponse(logger, method, authResponse, lastLabels, remoteAddr)
-			return authResponse.Success, nil
+			return &httpAuthContext{authResponse.Success, authResponse.Metadata, nil}
 		}
 		reason := client.getReason(lastError)
 		lastLabels = append(lastLabels, metrics.Label("reason", reason))
@@ -154,7 +192,7 @@ func (client *httpAuthClient) logAndReturnPermanentFailure(
 	method string,
 	lastLabels []metrics.MetricLabel,
 	logger log.Logger,
-) (bool, error) {
+) AuthenticationContext {
 	err := log.Wrap(
 		lastError,
 		EAuthBackendError,
@@ -169,7 +207,7 @@ func (client *httpAuthClient) logAndReturnPermanentFailure(
 		)...,
 	)
 	logger.Error(err)
-	return false, err
+	return &httpAuthContext{false, nil, err}
 }
 
 func (client *httpAuthClient) logTemporaryFailure(
