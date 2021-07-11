@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"encoding/base64"
+	"fmt"
 	goHttp "net/http"
 
 	"github.com/containerssh/http"
@@ -33,9 +35,13 @@ func (p *passwordHandler) OnRequest(request http.ServerRequest, response http.Se
 	if err := request.Decode(&requestObject); err != nil {
 		return err
 	}
-	success, err := p.backend.OnPassword(
+	password, err := base64.StdEncoding.DecodeString(requestObject.Password)
+	if err != nil {
+		return fmt.Errorf("failed to decode password (%w)", err)
+	}
+	success, metadata, err := p.backend.OnPassword(
 		requestObject.Username,
-		requestObject.Password,
+		password,
 		requestObject.RemoteAddress,
 		requestObject.ConnectionID,
 	)
@@ -44,11 +50,13 @@ func (p *passwordHandler) OnRequest(request http.ServerRequest, response http.Se
 		response.SetStatus(500)
 		response.SetBody(ResponseBody{
 			Success: false,
+			Metadata: metadata,
 		})
 		return nil
 	} else {
 		response.SetBody(ResponseBody{
 			Success: success,
+			Metadata: metadata,
 		})
 	}
 	return nil
@@ -64,7 +72,7 @@ func (p *pubKeyHandler) OnRequest(request http.ServerRequest, response http.Serv
 	if err := request.Decode(&requestObject); err != nil {
 		return err
 	}
-	success, err := p.backend.OnPubKey(
+	success, metadata, err := p.backend.OnPubKey(
 		requestObject.Username,
 		requestObject.PublicKey,
 		requestObject.RemoteAddress,
@@ -75,11 +83,13 @@ func (p *pubKeyHandler) OnRequest(request http.ServerRequest, response http.Serv
 		response.SetStatus(500)
 		response.SetBody(ResponseBody{
 			Success: false,
+			Metadata: metadata,
 		})
 		return nil
 	} else {
 		response.SetBody(ResponseBody{
 			Success: success,
+			Metadata: metadata,
 		})
 	}
 	return nil

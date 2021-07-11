@@ -74,31 +74,32 @@ func TestAuth(t *testing.T) {
 	}
 	defer lifecycle.Stop(context.Background())
 
-	success, err := client.Password("foo", []byte("bar"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+	success, metadata, err := client.Password("foo", []byte("bar"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, true, success)
+	assert.Nil(t, metadata)
 	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthBackendRequests)[0].Value)
 	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthSuccess)[0].Value)
 
-	success, err = client.Password("foo", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+	success, metadata, err = client.Password("foo", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, false, success)
 	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthFailure)[0].Value)
 
-	success, err = client.Password("crash", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+	success, metadata, err = client.Password("crash", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, false, success)
 	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthBackendFailure)[0].Value)
 
-	success, err = client.PubKey("foo", "ssh-rsa asdf", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+	success, metadata, err = client.PubKey("foo", "ssh-rsa asdf", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, true, success)
 
-	success, err = client.PubKey("foo", "ssh-rsa asdx", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+	success, metadata, err = client.PubKey("foo", "ssh-rsa asdx", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, false, success)
 
-	success, err = client.PubKey("crash", "ssh-rsa asdx", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+	success, metadata, err = client.PubKey("crash", "ssh-rsa asdx", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
 	assert.NotEqual(t, nil, err)
 	assert.Equal(t, false, success)
 }

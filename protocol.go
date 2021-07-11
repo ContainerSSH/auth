@@ -27,7 +27,7 @@ type PasswordAuthRequest struct {
 	// Password the user provided for authentication.
 	//
 	// required: true
-	Password []byte `json:"passwordBase64"`
+	Password string `json:"passwordBase64"`
 }
 
 // PublicKeyAuthRequest is an authentication request for public key authentication.
@@ -68,6 +68,12 @@ type ResponseBody struct {
 	//
 	// required: true
 	Success bool `json:"success"`
+
+	// Metadata is a set of key-value pairs that can be returned and either consumed by the configuration server or
+	// exposed in the backend as environment variables.
+	//
+	// required: false
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // Response is the full HTTP authentication response.
