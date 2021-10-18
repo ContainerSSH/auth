@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2: Fixed subpath handling.
+
+This release fixes a bug where subpaths (e.g. `/auth/password`) were not handled correctly.
+
 ## 1.0.1: Fixing ignored authentication config
 
 This release fixes [ContainerSSH/ContainerSSH#167](https://github.com/ContainerSSH/ContainerSSH/issues/167) where both the `password` and the `pubkey` options are ignored in the configuration.
