@@ -67,43 +67,48 @@ func TestAuth(t *testing.T) {
 			"FYI: errors during this test are expected as we test against error cases.",
 		),
 	)
-	client, lifecycle, metricsCollector, err := initializeAuth(logger)
-	if err != nil {
-		assert.Fail(t, "failed to initialize auth", err)
-		return
+
+	for name, subpath := range map[string]string{"empty": "", "auth": "/auth"} {
+		t.Run(fmt.Sprintf("subpath_%s", name), func(t *testing.T) {
+			client, lifecycle, metricsCollector, err := initializeAuth(logger, subpath)
+			if err != nil {
+				assert.Fail(t, "failed to initialize auth", err)
+				return
+			}
+			defer lifecycle.Stop(context.Background())
+
+			success, err := client.Password("foo", []byte("bar"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+			assert.Equal(t, nil, err)
+			assert.Equal(t, true, success)
+			assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthBackendRequests)[0].Value)
+			assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthSuccess)[0].Value)
+
+			success, err = client.Password("foo", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+			assert.Equal(t, nil, err)
+			assert.Equal(t, false, success)
+			assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthFailure)[0].Value)
+
+			success, err = client.Password("crash", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+			assert.NotEqual(t, nil, err)
+			assert.Equal(t, false, success)
+			assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthBackendFailure)[0].Value)
+
+			success, err = client.PubKey("foo", "ssh-rsa asdf", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+			assert.Equal(t, nil, err)
+			assert.Equal(t, true, success)
+
+			success, err = client.PubKey("foo", "ssh-rsa asdx", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+			assert.Equal(t, nil, err)
+			assert.Equal(t, false, success)
+
+			success, err = client.PubKey("crash", "ssh-rsa asdx", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
+			assert.NotEqual(t, nil, err)
+			assert.Equal(t, false, success)
+		})
 	}
-	defer lifecycle.Stop(context.Background())
-
-	success, err := client.Password("foo", []byte("bar"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
-	assert.Equal(t, nil, err)
-	assert.Equal(t, true, success)
-	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthBackendRequests)[0].Value)
-	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthSuccess)[0].Value)
-
-	success, err = client.Password("foo", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
-	assert.Equal(t, nil, err)
-	assert.Equal(t, false, success)
-	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthFailure)[0].Value)
-
-	success, err = client.Password("crash", []byte("baz"), "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
-	assert.NotEqual(t, nil, err)
-	assert.Equal(t, false, success)
-	assert.Equal(t, float64(1), metricsCollector.GetMetric(auth.MetricNameAuthBackendFailure)[0].Value)
-
-	success, err = client.PubKey("foo", "ssh-rsa asdf", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
-	assert.Equal(t, nil, err)
-	assert.Equal(t, true, success)
-
-	success, err = client.PubKey("foo", "ssh-rsa asdx", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
-	assert.Equal(t, nil, err)
-	assert.Equal(t, false, success)
-
-	success, err = client.PubKey("crash", "ssh-rsa asdx", "0123456789ABCDEF", net.ParseIP("127.0.0.1"))
-	assert.NotEqual(t, nil, err)
-	assert.Equal(t, false, success)
 }
 
-func initializeAuth(logger log.Logger) (auth.Client, service.Lifecycle, metrics.Collector, error) {
+func initializeAuth(logger log.Logger, subpath string) (auth.Client, service.Lifecycle, metrics.Collector, error) {
 	ready := make(chan bool, 1)
 	errors := make(chan error)
 
@@ -130,7 +135,7 @@ func initializeAuth(logger log.Logger) (auth.Client, service.Lifecycle, metrics.
 	client, err := auth.NewHttpAuthClient(
 		auth.ClientConfig{
 			ClientConfiguration: http.ClientConfiguration{
-				URL:     "http://127.0.0.1:8080",
+				URL:     fmt.Sprintf("http://127.0.0.1:8080%s", subpath),
 				Timeout: 2 * time.Second,
 			},
 			Password:    true,
