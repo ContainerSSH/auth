@@ -6,12 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/containerssh/auth"
 	"github.com/containerssh/geoip"
 	"github.com/containerssh/http"
 	"github.com/containerssh/log"
 	"github.com/containerssh/metrics"
-
-	"github.com/containerssh/auth"
 )
 
 // TestPasswordDisabled tests if the call fails with the correct error if the password authentication method is

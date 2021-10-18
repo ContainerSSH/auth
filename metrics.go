@@ -1,7 +1,7 @@
 package auth
 
 const (
-	// MetricNameAuthBackendRequests is the number of requests to the config server
+	// MetricNameAuthBackendRequests is the number of requests to the config server.
 	MetricNameAuthBackendRequests = "containerssh_auth_server_requests"
 
 	// MetricNameAuthBackendFailure is the number of request failures to the configuration backend.
