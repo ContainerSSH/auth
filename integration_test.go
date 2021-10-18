@@ -7,52 +7,51 @@ import (
 	"testing"
 	"time"
 
+	"github.com/containerssh/auth"
 	"github.com/containerssh/geoip"
 	"github.com/containerssh/http"
 	"github.com/containerssh/log"
 	"github.com/containerssh/metrics"
 	"github.com/containerssh/service"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/containerssh/auth"
 )
 
 type handler struct {
 }
 
 func (h *handler) OnPassword(
-	Username string,
-	Password []byte,
-	RemoteAddress string,
-	ConnectionID string,
+	username string,
+	password []byte,
+	remoteAddress string,
+	connectionID string,
 ) (bool, error) {
-	if RemoteAddress != "127.0.0.1" {
-		return false, fmt.Errorf("invalid IP: %s", RemoteAddress)
+	if remoteAddress != "127.0.0.1" {
+		return false, fmt.Errorf("invalid IP: %s", remoteAddress)
 	}
-	if ConnectionID != "0123456789ABCDEF" {
-		return false, fmt.Errorf("invalid connection ID: %s", ConnectionID)
+	if connectionID != "0123456789ABCDEF" {
+		return false, fmt.Errorf("invalid connection ID: %s", connectionID)
 	}
-	if Username == "foo" && string(Password) == "bar" {
+	if username == "foo" && string(password) == "bar" {
 		return true, nil
 	}
-	if Username == "crash" {
+	if username == "crash" {
 		// Simulate a database failure
 		return false, fmt.Errorf("database error")
 	}
 	return false, nil
 }
 
-func (h *handler) OnPubKey(Username string, PublicKey string, RemoteAddress string, ConnectionID string) (bool, error) {
-	if RemoteAddress != "127.0.0.1" {
-		return false, fmt.Errorf("invalid IP: %s", RemoteAddress)
+func (h *handler) OnPubKey(username string, publicKey string, remoteAddress string, connectionID string) (bool, error) {
+	if remoteAddress != "127.0.0.1" {
+		return false, fmt.Errorf("invalid IP: %s", remoteAddress)
 	}
-	if ConnectionID != "0123456789ABCDEF" {
-		return false, fmt.Errorf("invalid connection ID: %s", ConnectionID)
+	if connectionID != "0123456789ABCDEF" {
+		return false, fmt.Errorf("invalid connection ID: %s", connectionID)
 	}
-	if Username == "foo" && PublicKey == "ssh-rsa asdf" {
+	if username == "foo" && publicKey == "ssh-rsa asdf" {
 		return true, nil
 	}
-	if Username == "crash" {
+	if username == "crash" {
 		// Simulate a database failure
 		return false, fmt.Errorf("database error")
 	}

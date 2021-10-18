@@ -77,7 +77,7 @@ You can also use the authentication handler with the native Go HTTP library:
 func main() {
     logger := log.New(...)
     httpHandler := auth.NewHandler(&myHandler{}, logger)
-    http.HandleFunc("/auth", httpHandler)
+    http.Handle("/auth", httpHandler)
     http.ListenAndServe(":8090", nil)
 }
 ```
