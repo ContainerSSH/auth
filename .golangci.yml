@@ -81,6 +81,9 @@ linters:
 
     # endregion
 linters-settings:
+  gomoddirectives:
+    replace-allow-list:
+      - gopkg.in/yaml.v2
   govet:
     enable-all: true
     check-shadowing: false
