@@ -2,6 +2,7 @@ package auth
 
 import (
 	goHttp "net/http"
+	"strings"
 
 	"github.com/containerssh/http"
 	"github.com/containerssh/log"
@@ -13,10 +14,11 @@ type handler struct {
 }
 
 func (h handler) ServeHTTP(writer goHttp.ResponseWriter, request *goHttp.Request) {
-	switch request.URL.Path {
-	case "/password":
+	parts := strings.Split(request.URL.Path, "/")
+	switch parts[len(parts)-1] {
+	case "password":
 		h.passwordHandler.ServeHTTP(writer, request)
-	case "/pubkey":
+	case "pubkey":
 		h.pubkeyHandler.ServeHTTP(writer, request)
 	default:
 		writer.WriteHeader(404)
